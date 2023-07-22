@@ -60,3 +60,38 @@ function Get-Components {
         }
     }
 }
+
+function Get-Connector {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true, HelpMessage='Please provide the Subdomain')]
+        [ValidateNotNullOrEmpty()]
+        [string]$Subdomain,
+
+        [Parameter(Mandatory=$true, HelpMessage='Please provide the OAuth Token')]
+        [ValidateNotNullOrEmpty()]
+        [string]$BearerToken,
+
+        [Parameter(Mandatory=$true, HelpMessage='Please provide the Connector Id')]
+        [ValidateNotNullOrEmpty()]
+        [string]$ConnectorId
+    )
+
+    begin {
+        $uri = "https://$($Subdomain)-component_manager.cyberark.cloud/api/connectors/$($ConnectorId)/"
+        $header = Get-OAuthHeader -BearerToken $BearerToken
+    }
+
+    process {
+        try {
+            return Invoke-RestMethod -Uri $uri -Method Get -Headers $header
+        }
+        catch {
+            if($_.ErrorDetails.Message) {
+                Write-Error $_.ErrorDetails.Message
+            } else {
+                Write-Error $_
+            }
+        }
+    }
+}
