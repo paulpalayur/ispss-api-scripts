@@ -95,3 +95,42 @@ function Get-Connector {
         }
     }
 }
+
+function Get-SetupScript {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true, HelpMessage='Please provide the Subdomain')]
+        [ValidateNotNullOrEmpty()]
+        [string]$Subdomain,
+
+        [Parameter(Mandatory=$true, HelpMessage='Please provide the OAuth Token')]
+        [ValidateNotNullOrEmpty()]
+        [string]$BearerToken,
+
+        [Parameter(Mandatory=$false, HelpMessage='Please provide the OS type. Default is windows')]
+        [ValidateNotNullOrEmpty()]
+        [string]$OSType = "windows"
+    )
+
+    begin {
+        $uri = "https://$($Subdomain)-component_manager.cyberark.cloud/api/setup-script"
+        $header = Get-OAuthHeader -BearerToken $BearerToken
+        $header.Add("Content-Type", "application/json")
+        $body = @{
+            osType = $OSType
+        }|ConvertTo-Json
+    }
+
+    process {
+        try {
+            return Invoke-RestMethod -Uri $uri -Method Post -Headers $header -Body $body
+        }
+        catch {
+            if($_.ErrorDetails.Message) {
+                Write-Error $_.ErrorDetails.Message
+            } else {
+                Write-Error $_
+            }
+        }
+    }
+}
