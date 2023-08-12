@@ -27,8 +27,7 @@ function Get-APIServiceUserToken {
     process {
         try {
             Write-Verbose "Tenant url: $($tenantURL)"
-            $response = Invoke-RestMethod -Uri $tenantURL -Method Post -Body $body
-            return @{"Authorization" = "Bearer $($response.access_token)"}
+            return Invoke-RestMethod -Uri $tenantURL -Method Post -Body $body
         }
         catch {
             if($_.ErrorDetails.Message) {
