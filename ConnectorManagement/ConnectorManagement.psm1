@@ -123,7 +123,7 @@ function Get-SetupScript {
         $body = @{
             osType = $OSType
             installationPath = $InstallationPath
-        }|ConvertTo-Json        
+        }|ConvertTo-Json
     }
 
     process {
@@ -155,24 +155,13 @@ function Install-CPM {
         [ValidateNotNullOrEmpty()]
         [string]$BearerToken,
 
-        [Parameter(Mandatory=$true, HelpMessage='Please provide the Component Name')]        
-        [string]$ComponentName="CPM",
-
         [Parameter(Mandatory=$true, HelpMessage='Please provide the CPM User Name')]
         [ValidateNotNullOrEmpty()]
         [string]$CPMUserName,
 
-        [Parameter(Mandatory=$true, HelpMessage='Please provide the Installation Path')]
+        [Parameter(Mandatory=$true, HelpMessage='Is CPM Inactive? Default set to true')]
         [ValidateNotNullOrEmpty()]
-        [string]$InstallPath,
-
-        [Parameter(Mandatory=$true, HelpMessage='Is CPM Inactive? Default set to false')]
-        [ValidateNotNullOrEmpty()]
-        [bool]$CPMInactive=$false,
-
-        [Parameter(Mandatory=$false, HelpMessage='Is POC Mode?')]
-        [ValidateNotNullOrEmpty()]
-        [bool]$PoCMode=$false,
+        [bool]$CPMInactive=$true,
 
         [Parameter(Mandatory=$true, HelpMessage='Provide the installer user name')]
         [ValidateNotNullOrEmpty()]
@@ -185,6 +174,19 @@ function Install-CPM {
         [Parameter(Mandatory=$true, HelpMessage='Provide the Vault IP or FQDN')]
         [ValidateNotNullOrEmpty()]
         [string]$VaultIP,
+
+
+        [Parameter(Mandatory=$false, HelpMessage='Is POC Mode?')]
+        [ValidateNotNullOrEmpty()]
+        [bool]$PoCMode=$false,
+
+        [Parameter(Mandatory=$false, HelpMessage='Please provide the Component Name')]
+        [string]$ComponentName="cpm",
+
+        [Parameter(Mandatory=$false, HelpMessage='Please provide the Installation Path')]
+        [ValidateNotNullOrEmpty()]
+        [string]$InstallPath="C:\Program Files (x86)\CyberArk",
+
 
         [Parameter(Mandatory=$false, HelpMessage='Is PSM installed')]
         [ValidateNotNullOrEmpty()]
@@ -207,10 +209,10 @@ function Install-CPM {
         [bool]$disabled=$false
 
     )
-    
+
     begin {
 
-                
+
         $uri = "https://$($Subdomain)-component_manager.cyberark.cloud/api/connectors/$($ConnectorId)/components"
         $header = Get-OAuthHeader -BearerToken $BearerToken
         $header.Add("Content-Type", "application/json")
@@ -230,9 +232,11 @@ function Install-CPM {
                 vaultIP = $VaultIP
                 isPSMInstalled = $isPSMInstalled
             }
-        }|ConvertTo-Json  
+        }|ConvertTo-Json
+
+        Write-Verbose "Body is $($body)"
     }
-    
+
     process {
         try {
             return Invoke-RestMethod -Uri $uri -Method Post -Headers $header -Body $body
@@ -262,17 +266,13 @@ function Install-PSM {
         [ValidateNotNullOrEmpty()]
         [string]$BearerToken,
 
-        [Parameter(Mandatory=$true, HelpMessage='Please provide the Component Name')]        
+        [Parameter(Mandatory=$true, HelpMessage='Please provide the Component Name')]
         [string]$ComponentName="psm",
 
 
         [Parameter(Mandatory=$true, HelpMessage='Please provide the Installation Path')]
         [ValidateNotNullOrEmpty()]
         [string]$InstallPath,
-
-        [Parameter(Mandatory=$false, HelpMessage='Is POC Mode?')]
-        [ValidateNotNullOrEmpty()]
-        [bool]$PoCMode=$false,
 
         [Parameter(Mandatory=$true, HelpMessage='Provide the installer user name')]
         [ValidateNotNullOrEmpty()]
@@ -302,6 +302,10 @@ function Install-PSM {
         [ValidateNotNullOrEmpty()]
         [string]$DomainUserPassword,
 
+        [Parameter(Mandatory=$false, HelpMessage='Is POC Mode?')]
+        [ValidateNotNullOrEmpty()]
+        [bool]$PoCMode=$false,
+
         [Parameter(Mandatory=$false, HelpMessage='Label')]
         [ValidateNotNullOrEmpty()]
         [string]$label="PSM",
@@ -319,10 +323,10 @@ function Install-PSM {
         [bool]$disabled=$false
 
     )
-    
+
     begin {
 
-                
+
         $uri = "https://$($Subdomain)-component_manager.cyberark.cloud/api/connectors/$($ConnectorId)/components"
         $header = Get-OAuthHeader -BearerToken $BearerToken
         $header.Add("Content-Type", "application/json")
@@ -335,7 +339,7 @@ function Install-PSM {
             extraVars = @{
                 domain = $Domain
                 domainUserName = $DomainUserName
-                domainUserPassword = $DomainUserPassword                
+                domainUserPassword = $DomainUserPassword
                 installPath = $CPMInstallPath
                 pocMode = $PoCMode
                 vaultUser = $InstallerUserName
@@ -343,9 +347,9 @@ function Install-PSM {
                 vaultIP = $VaultIP
                 psmIsDomain = $PSMIsDomain
             }
-        }|ConvertTo-Json  
+        }|ConvertTo-Json
     }
-    
+
     process {
         try {
             return Invoke-RestMethod -Uri $uri -Method Post -Headers $header -Body $body
