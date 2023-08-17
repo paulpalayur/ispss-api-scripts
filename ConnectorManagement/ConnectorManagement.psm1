@@ -233,8 +233,6 @@ function Install-CPM {
                 isPSMInstalled = $isPSMInstalled
             }
         }|ConvertTo-Json
-
-        Write-Verbose "Body is $($body)"
     }
 
     process {
@@ -266,14 +264,6 @@ function Install-PSM {
         [ValidateNotNullOrEmpty()]
         [string]$BearerToken,
 
-        [Parameter(Mandatory=$true, HelpMessage='Please provide the Component Name')]
-        [string]$ComponentName="psm",
-
-
-        [Parameter(Mandatory=$true, HelpMessage='Please provide the Installation Path')]
-        [ValidateNotNullOrEmpty()]
-        [string]$InstallPath,
-
         [Parameter(Mandatory=$true, HelpMessage='Provide the installer user name')]
         [ValidateNotNullOrEmpty()]
         [string]$InstallerUserName,
@@ -301,6 +291,13 @@ function Install-PSM {
         [Parameter(Mandatory=$true, HelpMessage='Provide the Administrator Domain User Password')]
         [ValidateNotNullOrEmpty()]
         [string]$DomainUserPassword,
+
+        [Parameter(Mandatory=$false, HelpMessage='Please provide the Component Name')]
+        [string]$ComponentName="psm",
+
+        [Parameter(Mandatory=$false, HelpMessage='Please provide the Installation Path')]
+        [ValidateNotNullOrEmpty()]
+        [string]$InstallPath="C:\Program Files (x86)\CyberArk",
 
         [Parameter(Mandatory=$false, HelpMessage='Is POC Mode?')]
         [ValidateNotNullOrEmpty()]
@@ -340,7 +337,7 @@ function Install-PSM {
                 domain = $Domain
                 domainUserName = $DomainUserName
                 domainUserPassword = $DomainUserPassword
-                installPath = $CPMInstallPath
+                installPath = $InstallPath
                 pocMode = $PoCMode
                 vaultUser = $InstallerUserName
                 vaultPassword = $InstallerUserPassword
